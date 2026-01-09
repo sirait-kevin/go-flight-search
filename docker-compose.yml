@@ -1,0 +1,38 @@
+services:
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: go-flight-search-main
+    ports:
+      - "8080:8080"
+    environment:
+      - APP_ENV=dev
+      - REDIS_ADDR=redis:6379
+      - REDIS_PASSWORD=supersecretpassword
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.2
+    container_name: go-flight-search-redis
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    volumes:
+      - ./internal/infra/redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - redis-data:/data
+    environment:
+      - REDIS_PASSWORD=supersecretpassword
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "supersecretpassword", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  redis-data:
