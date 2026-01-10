@@ -46,7 +46,7 @@ clean:
 	$(COMPOSE) down -v
 
 dev:
-	go run ./cmd/api
+	go run ./cmd/main
 
 test:
 	go test ./...

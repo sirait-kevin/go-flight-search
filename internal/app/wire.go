@@ -1,6 +1,10 @@
 package app
 
-import "net/http"
+import (
+	"github.com/gorilla/mux"
+	"go-flight-search/internal/handlers/middlewares"
+	"net/http"
+)
 
 func Run() *http.Server {
 	// TODO:
@@ -10,15 +14,18 @@ func Run() *http.Server {
 	// - init usecase
 	// - init router
 
-	mux := http.NewServeMux()
+	router := mux.NewRouter()
 
-	mux.HandleFunc("/ping", func(w http.ResponseWriter, _ *http.Request) {
+	router.Use(middlewares.LoggingMiddleware)
+	router.Use(middlewares.RecoverMiddleware)
+
+	router.HandleFunc("/ping", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("ok"))
-	})
+	}).Methods(http.MethodGet)
 
 	return &http.Server{
 		Addr:    ":8080",
-		Handler: mux,
+		Handler: router,
 	}
 }
