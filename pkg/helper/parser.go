@@ -63,3 +63,16 @@ func FormatIDR(amount int) string {
 
 	return "Rp " + strings.Join(parts, ".")
 }
+
+func FormatDuration(minutes int) string {
+	h := minutes / 60
+	m := minutes % 60
+
+	if h > 0 && m > 0 {
+		return fmt.Sprintf("%dh %dm", h, m)
+	}
+	if h > 0 {
+		return fmt.Sprintf("%dh", h)
+	}
+	return fmt.Sprintf("%dm", m)
+}

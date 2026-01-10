@@ -17,6 +17,9 @@ WORKDIR /app
 
 COPY --from=builder /app/app .
 
+# Copy data folder (JSON files)
+COPY --from=builder /app/mock_data /app/mock_data
+
 EXPOSE 8080
 
 CMD ["./app"]

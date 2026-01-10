@@ -76,5 +76,5 @@ func formatBaggage(carry int, checked int) (string, string) {
 	}
 
 	// Both included
-	return fmt.Sprintf("%d cabin baggage", carry), fmt.Sprintf("%d cargo baggage", checked)
+	return fmt.Sprintf("%d cabin baggage(s)", carry), fmt.Sprintf("%d cargo baggage(s)", checked)
 }

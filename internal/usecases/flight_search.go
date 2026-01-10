@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-flight-search/internal/domain"
+	"go-flight-search/pkg/errs"
 	"go-flight-search/pkg/helper"
+	"net/http"
 	"sort"
 	"time"
 )
@@ -25,7 +27,7 @@ func (u *SearchFlightsUsecase) Execute(ctx context.Context, q domain.SearchQuery
 	}
 
 	type result struct {
-		flights []domain.Flight
+		flights *[]domain.Flight
 		err     error
 	}
 
@@ -34,23 +36,31 @@ func (u *SearchFlightsUsecase) Execute(ctx context.Context, q domain.SearchQuery
 	for _, p := range u.Providers {
 		go func(p FlightProvider) {
 			flights, err := p.Search(q)
-			ch <- result{flights: *flights, err: err}
+			ch <- result{flights: flights, err: err}
 		}(p)
 	}
 
 	var all []domain.Flight
+	var err error
 
-	timeout := time.After(400 * time.Millisecond)
+	timeout := time.After(5 * time.Second)
 
 	for i := 0; i < len(u.Providers); i++ {
 		select {
 		case r := <-ch:
 			if r.err == nil {
-				all = append(all, r.flights...)
+				all = append(all, *r.flights...)
+				err = nil
+			} else {
+				err = errs.NewWithMessage(http.StatusInternalServerError, r.err.Error())
 			}
 		case <-timeout:
 			break
 		}
+	}
+
+	if err != nil {
+		return nil, false, err
 	}
 
 	sort.Slice(all, func(i, j int) bool {

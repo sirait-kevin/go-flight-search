@@ -17,7 +17,7 @@ func Run() *http.Server {
 	// - init redis
 	// - init providers
 	GarudaProvider := garuda.New("mock_data/garuda_indonesia_search_response.json", 50, 100)
-	RedisCache, err := cache.New("localhost:6379", "supersecretpassword")
+	RedisCache, err := cache.New("redis:6379", "supersecretpassword")
 	if err != nil {
 		panic(err)
 	}
