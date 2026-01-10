@@ -8,12 +8,9 @@ import (
 )
 
 // ParseRFC3339ToUnix parses RFC3339 datetime string to unix timestamp (seconds)
-func ParseRFC3339ToUnix(s string) (int64, error) {
-	t, err := time.Parse(time.RFC3339, s)
-	if err != nil {
-		return 0, err
-	}
-	return t.Unix(), nil
+func ParseRFC3339ToUnix(s string) int64 {
+	t, _ := time.Parse(time.RFC3339, s)
+	return t.Unix()
 }
 
 // FormatToIndonesiaTime formats RFC3339 time to "WIB/WITA/WIT"

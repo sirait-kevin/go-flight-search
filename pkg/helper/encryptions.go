@@ -7,9 +7,9 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
+	"github.com/cespare/xxhash/v2"
 	"io"
-
-	"golang.org/x/crypto/bcrypt"
+	"strconv"
 )
 
 var encryptionKey = []byte("a very very very very secret key") // 32 bytes
@@ -46,16 +46,14 @@ func Decrypt(cipherText []byte) (string, error) {
 	return string(ciphertext), nil
 }
 
-// HashPassword hashes plain text password
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
-}
-
 // GenerateSignature where key = is secret key)
 func GenerateSignature(key, data string) string {
 	h := hmac.New(sha256.New, []byte(key))
 	io.WriteString(h, data)
 
 	return fmt.Sprintf("%x", string(h.Sum(nil)))
+}
+
+func Hash(s string) string {
+	return strconv.FormatUint(xxhash.Sum64String(s), 10)
 }
